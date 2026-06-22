@@ -1,0 +1,7 @@
+SIMULATOR=https://github.com/cloud-DTs/CloudDeployerTestSimulator.git
+SYSML_CONVERTER=https://github.com/cloud-DTs/DigitalTwinProfileSysMLv2.git
+FED_TOOL=https://github.com/mcotrotzo/FedSysML.git
+DIGITAL_TWIN_MANAGER=https://github.com/cloud-DTs/digital-twin-manager.git
+AWS_SECRET_ACCESS_KEY=
+AWS_ACCESS_KEY_ID=
+AWS_REGION=eu-central-1
