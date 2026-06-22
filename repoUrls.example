@@ -5,3 +5,5 @@ DIGITAL_TWIN_MANAGER=https://github.com/cloud-DTs/digital-twin-manager.git
 AWS_SECRET_ACCESS_KEY=
 AWS_ACCESS_KEY_ID=
 AWS_REGION=eu-central-1
+GITHUB_USERNAME=
+GITHUB_PASSWORD=
