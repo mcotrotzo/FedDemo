@@ -3,6 +3,8 @@ from time import time
 from datetime import datetime, timezone
 def lambda_handler(event, context):
 
+    if isinstance(event.get("body"), str):
+        event = json.loads(event["body"])
     kombi_data = event.get("ConsumptionStrategy", {})
     pv_data = kombi_data.get("production", {})
     battery_data = kombi_data.get("status", {})
