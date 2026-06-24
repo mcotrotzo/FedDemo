@@ -117,11 +117,10 @@ def deploy_twins():
         os.makedirs(dst_json_dir, exist_ok=True)
         shutil.copy(src_json, f"{dst_json_dir}/{twin}_federation_input.json")
 
+SIM_PID_FILE = "simulator.pid"
+
 def deploy_simulator():
     sim_folder = DIR_MAPPING["simulator"]
-    env = {"PULUMI_CONFIG_PASSPHRASE": ""}
-    merged_env = {**os.environ.copy(), **env}
-
     os.makedirs(f"{sim_folder}/input", exist_ok=True)
     credentials_data = {
         "aws_access_key_id": os.getenv("AWS_ACCESS_KEY_ID", ""),
@@ -131,18 +130,17 @@ def deploy_simulator():
     with open(f"{sim_folder}/input/config_credentials.json", "w") as f:
         json.dump(credentials_data, f, indent=4)
 
-    run_cmd(["pulumi", "login", "--local"], cwd=sim_folder, env=env)
-    run_cmd(["pulumi", "package", "add", "terraform-provider", "hashicorp/local"], cwd=sim_folder, env=env)
-    subprocess.run(["pulumi", "stack", "init", "dev"], cwd=sim_folder, env=merged_env)
-    run_cmd(["pulumi", "up", "--yes"], cwd=sim_folder, env=env)
-
-    res = subprocess.run(["pulumi", "stack", "output", "ec2_public_ip"], cwd=sim_folder, text=True, capture_output=True, env=merged_env)
-    ec2_ip = res.stdout.strip()
-
-    print("Simulator deployment done.")
-    if ec2_ip:
-        print(f"URL: http://{ec2_ip}:5000")
-
+    proc = subprocess.Popen(
+        ["python", "main.py"],
+        cwd=sim_folder,
+        stdout=sys.stdout,
+        stderr=sys.stderr,
+    )
+    with open(SIM_PID_FILE, "w") as f:
+        f.write(str(proc.pid))
+    time.sleep(3)
+    print(f"Simulator started (PID {proc.pid})")
+    print("URL: http://127.0.0.1:5000")
 def deploy_fedtwin():
     fed_folder = DIR_MAPPING["fed_tool"]
     run_cmd(["python", "main.py"], cwd=f"{fed_folder}/src")
@@ -178,12 +176,18 @@ def destroy(twins=True, simulator=True, fedtwin=True):
                 input="destroy\n",
                 text=True
             )
-
     if simulator:
-        sim_folder = DIR_MAPPING.get("simulator")
-        if sim_folder and os.path.exists(sim_folder):
-            env = {**os.environ.copy(), "PULUMI_CONFIG_PASSPHRASE": ""}
-            subprocess.run(["pulumi", "destroy", "--yes"], cwd=sim_folder, env=env)
+        if os.path.exists(SIM_PID_FILE):
+            with open(SIM_PID_FILE) as f:
+                pid = int(f.read().strip())
+            try:
+                os.kill(pid, 15)  # SIGTERM
+                print(f"Simulator stopped (PID {pid})")
+            except ProcessLookupError:
+                print("Simulator process already gone.")
+            os.remove(SIM_PID_FILE)
+        else:
+            print("No simulator PID file found.")
     if fedtwin:
         fed_folder = DIR_MAPPING.get("fed_tool")
         if fed_folder and os.path.exists(f"{fed_folder}/output"):

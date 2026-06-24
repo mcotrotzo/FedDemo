@@ -16,12 +16,7 @@ docker build -t batterypv-example .
 Start a persistent container to avoid re-cloning repos and re-installing dependencies on every run:
 
 ```bash
-docker run -it -d \
-  -v //var/run/docker.sock:/var/run/docker.sock \
-  -v batterypv-data:/app \
-  --name batterypv \
-  --entrypoint sleep \
-  batterypv-example infinity
+docker run -it -d -v /var/run/docker.sock:/var/run/docker.sock -v batterypv-data:/app --name batterypv -p 5000:5000 --entrypoint sleep batterypv-example infinity
 ```
 
 Then use `docker exec` for all commands:

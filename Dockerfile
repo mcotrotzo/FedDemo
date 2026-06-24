@@ -15,10 +15,6 @@ RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/sh
 RUN curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh
 
 
-RUN curl -fsSL https://get.pulumi.com | sh
-ENV PATH="/root/.pulumi/bin:${PATH}"
-
-
 WORKDIR /app
 
 
