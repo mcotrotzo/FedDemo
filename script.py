@@ -147,7 +147,7 @@ def deploy_fedtwin():
     fed_folder = DIR_MAPPING["fed_tool"]
     run_cmd(["python", "main.py"], cwd=f"{fed_folder}/src")
     
-    # Fix hardcoded paths in generated main.tf
+    
     tf_path = f"{fed_folder}/output/main.tf"
     with open(tf_path, "r") as f:
         content = f.read()

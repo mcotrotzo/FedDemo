@@ -18,7 +18,7 @@ package PVTwin {{
     #Twin def PV {{
         #entity PV {{
             #constAttribute generatedPower {{
-                :>> value default "50.0";
+                :>> value default "30.0";
                 :>> dataType default AttributeDataType::DOUBLE;
             }}
         }}
